@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function() {
+        // Prevent extension security errors in iframes
+        try {
+          var suppressError = function(msg, src) {
+            var m = String(msg || '');
+            var s = String(src || '');
+            return (
+              s.indexOf('chrome-extension://') !== -1 ||
+              m.indexOf('cross-origin frame') !== -1 ||
+              m.indexOf('Location') !== -1 ||
+              m.indexOf('SecurityError') !== -1
+            );
+          };
+
+          window.addEventListener('error', function(event) {
+            if (suppressError(event.message, event.filename) || (event.error && suppressError(event.error.message, ''))) {
+              event.preventDefault();
+              event.stopPropagation();
+              event.stopImmediatePropagation();
+              return true;
+            }
+          }, true);
+
+          window.addEventListener('unhandledrejection', function(event) {
+            if (event.reason && suppressError(event.reason.message || event.reason, '')) {
+              event.preventDefault();
+            }
+          });
+
+          var prevOnError = window.onerror;
+          window.onerror = function(message, source) {
+            if (suppressError(message, source)) return true;
+            if (prevOnError) return prevOnError.apply(this, arguments);
+          };
+        } catch (e) {}
+
+        // Safe top / parent proxies to avoid cross-origin Location access
+        try {
+          Object.defineProperty(window, 'top', {
+            configurable: true,
+            get: function() { return window; }
+          });
+        } catch (e) {}
+        try {
+          Object.defineProperty(window, 'parent', {
+            configurable: true,
+            get: function() { return window; }
+          });
+        } catch (e) {}
+
+        // Ensure window.fetch is writable and configurable
+        try {
+          var _fetch = window.fetch;
+          if (window.Window && window.Window.prototype) {
+            var desc = Object.getOwnPropertyDescriptor(Window.prototype, 'fetch');
+            if (desc && desc.get && !desc.set) {
+              Object.defineProperty(Window.prototype, 'fetch', {
+                configurable: true,
+                enumerable: true,
+                get: desc.get,
+                set: function(val) {
+                  _fetch = val;
+                }
+              });
+            }
+          }
+          Object.defineProperty(window, 'fetch', {
+            configurable: true,
+            enumerable: true,
+            get: function() {
+              return _fetch;
+            },
+            set: function(val) {
+              _fetch = val;
+            }
+          });
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MEGACESTA - Portal, Rifa y Programa de Líderes</title>
+    <meta name="description" content="Plataforma completa de autofinanciamiento: Portal comunitario, sistema de dos rifas simultáneas con sorteo automático y programa de líderes/referidos con comisiones." />
+    <meta property="og:title" content="MEGACESTA - Portal, Rifa y Programa de Líderes" />
+    <meta property="og:description" content="Plataforma completa de autofinanciamiento: Portal comunitario, sistema de dos rifas simultáneas con sorteo automático y programa de líderes/referidos con comisiones." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#f3f5fa] text-[#0b1f3a] min-h-screen antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

@@ -1,0 +1,6 @@
+{
+  "name": "MEGACESTA - Portal, Rifa y Programa de Líderes",
+  "description": "Plataforma completa de autofinanciamiento: Portal comunitario, sistema de dos rifas simultáneas con sorteo automático y programa de líderes/referidos con comisiones.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
